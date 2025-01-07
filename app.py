@@ -192,31 +192,16 @@ class StreamlitUI:
             with st.chat_message("assistant"):
                 streamlit_callback = StreamlitCallbackHandler(st.container())  # Create the callback handler
                 response = chat_agent.get_response(user_query, callbacks=[streamlit_callback])  # Pass `callbacks` (plural)
-                # st.session_state.messages.append(
-                #     {'role': 'assistant', 'content': response}
-                # )
-                # st.write(response)
-
-                # Format the response as a list if it is a list
-                if isinstance(response, list):
-                    st.markdown("**Response:**")
-                    for item in response:
-                        if isinstance(item, dict):  # Check if each item is a dictionary
-                            st.markdown(f"- **{item['name']}**: Grade = {item['grade']}")
-                        else:
-                            st.markdown(f"- {item}")
-                else:
-                    st.write(response)  # Display as plain text if not a list
-
                 st.session_state.messages.append(
                     {'role': 'assistant', 'content': response}
                 )
+                st.write(response)
 
     def display_footer(self):
         st.markdown("---")
         st.markdown(
             '<div class="footer">'
-            'Made with ❤️ by Akshada | Powered by LangChain and Streamlit'
+            'Made with ❤️ by Akshada'
             '</div>',
             unsafe_allow_html=True
         )
