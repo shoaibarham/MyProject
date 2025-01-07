@@ -25,7 +25,7 @@ A powerful and intuitive Streamlit application that enables natural language que
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/sql-chat-app.git
+git clone https://github.com/akshada2712/SQL-Query-LLM.git
 cd sql-chat-app
 ```
 
