@@ -10,36 +10,23 @@ import sqlite3
 from langchain_groq import ChatGroq
 from typing import Optional, Dict, List
 
-
-# Set page config FIRST
 st.set_page_config(page_title="LangChain SQL Chat", page_icon="💬", layout="wide")
 
-
-# Custom CSS for styling
+# Custom CSS for modern styling
 st.markdown(
     """
     <style>
-    .big-font {
-        font-size: 30px !important;
-        font-weight: bold;
-    }
-    .medium-font {
-        font-size: 20px !important;
-    }
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #f1f1f1;
-        text-align: center;
-        padding: 10px;
-    }
+    body { background-color: #f4f4f9; }
+    .big-font { font-size: 32px !important; font-weight: bold; color: #333; }
+    .medium-font { font-size: 18px !important; color: #555; }
+    .chat-message { padding: 12px; border-radius: 10px; margin: 8px 0; }
+    .user-message { background-color: #0078D7; color: white; text-align: right; }
+    .assistant-message { background-color: #e1eafd; text-align: left; }
+    .footer { text-align: center; padding: 10px; font-size: 14px; color: #777; }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
 
 class DatabaseConfig:
     LOCAL_DB = "USE_LOCALDB"
@@ -56,163 +43,116 @@ class DatabaseConfig:
             elif self.db_uri == self.MYSQL:
                 return self._configure_mysql()
             else:
-                raise ValueError("Invalid database configuration. Please choose a valid database type.")
+                raise ValueError("Invalid database configuration.")
         except Exception as e:
-            st.error(f"Error configuring database: {str(e)}")
-            st.stop()  # Stop the app if there's an error
+            st.error(f"Database error: {str(e)}")
+            st.stop()
 
     def _configure_sqlite(self) -> SQLDatabase:
         try:
-            dbfilepath = (Path(__file__).parent / "student.db").absolute()  # Ensure the file exists
+            dbfilepath = (Path(__file__).parent / "routes.db").absolute()
             if not dbfilepath.exists():
-                raise FileNotFoundError(f"SQLite database file not found at: {dbfilepath}")
-            
+                raise FileNotFoundError(f"Database file not found: {dbfilepath}")
             creator = lambda: sqlite3.connect(f"file:{dbfilepath}?mode=ro", uri=True)
             return SQLDatabase(create_engine("sqlite:///", creator=creator))
         except Exception as e:
-            st.error(f"Error configuring SQLite database: {str(e)}")
+            st.error(f"SQLite error: {str(e)}")
             st.stop()
 
     def _configure_mysql(self) -> SQLDatabase:
         try:
-            required_fields = ["host", "user", "password", "database"]
-            if not all(field in self.mysql_config for field in required_fields):
-                raise ValueError("Please provide all MySQL connection details.")
-            
+            if not all(field in self.mysql_config for field in ["host", "user", "password", "database"]):
+                raise ValueError("Incomplete MySQL credentials.")
             connection_string = (
                 f"mysql+mysqlconnector://{self.mysql_config['user']}:{self.mysql_config['password']}"
                 f"@{self.mysql_config['host']}/{self.mysql_config['database']}"
             )
             return SQLDatabase(create_engine(connection_string))
         except Exception as e:
-            st.error(f"Error configuring MySQL database: {str(e)}")
+            st.error(f"MySQL error: {str(e)}")
             st.stop()
 
-
-class ChatAgent: 
+class ChatAgent:
     def __init__(self, db: SQLDatabase, api_key: str):
         self.llm = ChatGroq(groq_api_key=api_key, model='gemma2-9b-it')
         self.toolkit = SQLDatabaseToolkit(db=db, llm=self.llm)
         self.agent = create_sql_agent(
             llm=self.llm, 
             toolkit=self.toolkit,
-            verbose=True, 
+            verbose=False,
             agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION
         )
 
-    def get_response(self, query: str, callbacks: List[StreamlitCallbackHandler]) -> str: 
-        return self.agent.run(query, callbacks=callbacks)
-
+    def get_response(self, query: str, callbacks: List[StreamlitCallbackHandler]) -> str:
+        raw_response = self.agent.run(query, callbacks=callbacks)
+        return raw_response.split("Complete!")[-1].strip() if "Complete!" in raw_response else raw_response.strip()
 
 class StreamlitUI:
     def __init__(self):
         self.db_config = DatabaseConfig()
         self.setup_sidebar()
         self.display_header()
-        self.display_summary()
 
     def display_header(self):
-        st.markdown('<p class="big-font">💬 Chat with SQL Database</p>', unsafe_allow_html=True)
-        st.markdown('<p class="medium-font">Ask natural language questions and get answers from your SQL database!</p>', unsafe_allow_html=True)
-        st.markdown("---")
-
-    def display_summary(self):
-        st.markdown("""
-        ### **How It Works**
-        1. **Choose Your Database**: Select either a local SQLite database or connect to a MySQL database.
-        2. **Enter Your Query**: Type your question in natural language (e.g., "Show me all students with grades above 90").
-        3. **Get Insights**: The app will translate your query into SQL, execute it, and display the results.
-        """)
+        st.markdown('<p class="big-font">💬 SQL Chat Assistant</p>', unsafe_allow_html=True)
         st.markdown("---")
 
     def setup_sidebar(self):
         with st.sidebar:
-            st.markdown("### **Database Configuration**")
-            radio_opts = ["Use SQLLite 3 Database: Student.db", "Connect to your SQL Database"]
-            selected_opt = st.radio(
-                label="Choose your database:", 
-                options=radio_opts
-            )
+            st.markdown("### Database Configuration")
+            options = ["SQLite (routes.db)", "Connect to MySQL"]
+            choice = st.radio("Choose Database:", options)
+            self.db_config.db_uri = DatabaseConfig.MYSQL if options.index(choice) == 1 else DatabaseConfig.LOCAL_DB
             
-            if radio_opts.index(selected_opt) == 1:  # Connect to SQL workbench
-                self.db_config.db_uri = DatabaseConfig.MYSQL
+            if self.db_config.db_uri == DatabaseConfig.MYSQL:
                 self.db_config.mysql_config = {
-                    "host": st.text_input("MySQL Host Name"),
-                    "user": st.text_input("SQL Username"),
-                    "password": st.text_input("SQL Password", type="password"),
-                    "database": st.text_input("SQL Database Name")
+                    "host": st.text_input("Host"),
+                    "user": st.text_input("User"),
+                    "password": st.text_input("Password", type="password"),
+                    "database": st.text_input("Database")
                 }
-            else:  # Use SQLite
-                self.db_config.db_uri = DatabaseConfig.LOCAL_DB
-
-            st.markdown("---")
-            st.markdown("### **API Key**")
+            
+            st.markdown("### API Key")
             self.api_key = st.text_input("Groq API Key", type="password")
-            st.markdown("---")
-            st.markdown("### **Instructions**")
-            st.info("""
-            - Provide your Groq API key to enable the chat functionality.
-            - Ensure your database credentials are correct.
-            - Use natural language to query your database.
-            """)
 
     def initialize_chat(self):
         if not self.api_key:
-            st.info("Please add Groq API key")
+            st.warning("Enter Groq API Key to continue.")
             return None
-        
         try:
             db = self.db_config.configure_db()
-            if db is None:
-                st.error("Failed to configure the database.")
-                return None
-            return ChatAgent(db, self.api_key)
+            return ChatAgent(db, self.api_key) if db else None
         except Exception as e:
-            st.error(f"Error initializing chat agent: {str(e)}")
+            st.error(f"Chat setup error: {str(e)}")
             return None
 
     def run_chat_interface(self, chat_agent: ChatAgent):
         if not chat_agent:
             return 
         
-        if "messages" not in st.session_state or st.sidebar.button("Clear Message History"):
-            st.session_state["messages"] = [
-                {'role': 'assistant', 'content': 'How can I help you?'}
-                ]
+        if "messages" not in st.session_state or st.sidebar.button("Clear Chat"):
+            st.session_state["messages"] = [{'role': 'assistant', 'content': 'How can I help you?'}]
         
-        for message in st.session_state.messages:
-            st.chat_message(message["role"]).write(message["content"])
+        for msg in st.session_state.messages:
+            st.chat_message(msg["role"]).write(msg["content"])
 
-        user_query = st.chat_input(placeholder="What query do you want to perform on the database? ")
-
+        user_query = st.chat_input("Enter your SQL question:")
         if user_query:
             st.session_state.messages.append({"role": "user", "content": user_query})
             st.chat_message("user").write(user_query)
-
             with st.chat_message("assistant"):
-                streamlit_callback = StreamlitCallbackHandler(st.container())  # Create the callback handler
-                response = chat_agent.get_response(user_query, callbacks=[streamlit_callback])  # Pass `callbacks` (plural)
-                st.session_state.messages.append(
-                    {'role': 'assistant', 'content': response}
-                )
+                response = chat_agent.get_response(user_query, callbacks=[])
+                st.session_state.messages.append({'role': 'assistant', 'content': response})
                 st.write(response)
 
     def display_footer(self):
-        st.markdown("---")
-        st.markdown(
-            '<div class="footer">'
-            'Made with ❤️ by Akshada'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
+        st.markdown('<div class="footer">SQL Chat Assistant - Powered by LangChain</div>', unsafe_allow_html=True)
 
 def main():
     ui = StreamlitUI()
     chat_agent = ui.initialize_chat()
     ui.run_chat_interface(chat_agent)
     ui.display_footer()
-
 
 if __name__ == "__main__":
     main()

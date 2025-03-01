@@ -1,0 +1,343 @@
+/* make the background of page deep blue */
+body {
+    background-image: url('./ferry_image.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* can you make the input field */
+input {
+    background: #dcdbdb;
+    color: #010101;
+    border: 1px solid #ffffff;
+    border-radius: 20px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.chat-container {
+    max-width: 700px; /* Reduced width */
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+    text-align: center;
+    height: 800px; /* Increased height */
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Added for positioning recommendations */
+    background-size: cover;
+    background-position: center;
+}
+
+.chat-title {
+    font-size: 24px; /* Increased font size */
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-title i {
+    margin-right: 10px;
+}
+
+.chat-box {
+    flex: 1;
+    max-height: 600px; /* Increased height */
+    overflow-y: auto;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: rgba(234, 230, 230, 0.8); /* Semi-transparent background */
+    text-align: left;
+}
+
+.chat-message {
+    padding: 10px 15px; /* Adjusted padding */
+    border-radius: 15px; /* Rounded chat bubbles */
+    margin: 8px 0;
+    max-width: 80%;
+    font-size: 16px;
+    line-height: 1.5;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Slight shadow */
+    animation: fadeIn 0.5s ease-in-out; /* Fade-in effect */
+    position: relative; /* Added for positioning edit button */
+}
+
+.user-message {
+    background: #E3F2FD; /* Light blue chat bubbles for users */
+    color: #000000;
+    text-align: right;
+    margin-left: auto;
+}
+
+.assistant-message {
+    background: #FFFFFF; /* White chat bubbles for bot responses */
+    color: #000000;
+    text-align: left;
+}
+
+.recommendations-container {
+    display: flex;
+    flex-direction: column; /* Stack recommendations vertically */
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.recommendations, .dynamic-recommendations {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.recommendation-button {
+    background: #FFFFFF; /* Match assistant message background */
+    color: #000000;
+    border: none;
+    border-radius: 15px; /* Rounded corners */
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    text-align: left;
+}
+
+.recommendation-button:hover {
+    background: #f0f0f0; /* Slightly darker on hover */
+}
+
+.chat-input-container {
+    display: flex;
+    margin-top: 15px;
+    justify-content: flex-end;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px; /* Rounded corners */
+    font-size: 16px;
+}
+
+.chat-button {
+    padding: 12px 20px;
+    background: #030303; /* Blue send button */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px; /* Rounded corners */
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.chat-button:hover {
+    background: #afc3d1; /* Hover effect */
+}
+
+.edit-button {
+    background: #789eb9; /* Blue edit button to match send button */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Rounded corners */
+    font-size: 12px;
+    padding: 5px;
+    position: absolute; /* Positioning for edit button */
+    top: 50%;
+    left: 10px; /* Moved to the left side */
+    transform: translateY(-50%); /* Center vertically */
+    transition: background 0.3s ease;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.edit-button:hover {
+    background: #0056b3; /* Darker blue on hover to match send button */
+}
+
+.edit-button::before {
+    content: "✎"; /* Edit icon */
+    margin-right: 5px;
+    margin-bottom: 2px;
+}
+
+.edit-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.edit-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.edit-submit-button {
+    padding: 8px 12px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.edit-submit-button:hover {
+    background: #0056b3;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.login-input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.login-button {
+    padding: 10px 20px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.login-button:hover {
+    background: #0056b3;
+}
+
+.logout-button {
+    padding: 10px 20px;
+    background: #FF0000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+    align-self: flex-end;
+    margin-bottom: 10px;
+}
+
+.logout-button:hover {
+    background: #CC0000;
+}
+
+.admin-container {
+    margin-top: 20px;
+}
+
+.admin-button {
+    padding: 10px 20px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.admin-button:hover {
+    background: #0056b3;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    margin-top: 10px;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: #000000;
+    border-radius: 50%;
+    animation: typing 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+.highlight {
+    background-color: #ffff99; /* Light yellow highlight */
+    animation: fadeOutHighlight 2s forwards; /* Fade out highlight */
+}
+
+@keyframes fadeOutHighlight {
+    from { background-color: #ffff99; }
+    to { background-color: transparent; }
+}
+
+.structured-response {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 5px 0;
+}
+
+.structured-response ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.structured-response li {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.structured-response li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.structured-response strong {
+  color: #2c3e50;
+  margin-right: 5px;
+}
